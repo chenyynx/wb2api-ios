@@ -10,6 +10,19 @@
 
 应用不直接访问上游服务，全部读写经由面板提供的 HTTP API 完成，鉴权使用面板的 `api_key`。
 
+## 界面
+
+<p align="center">
+  <img src="docs/screenshots/01-overview.png" width="24%" alt="概览" />
+  <img src="docs/screenshots/02-accounts.png" width="24%" alt="账号" />
+  <img src="docs/screenshots/03-tasks.png" width="24%" alt="任务" />
+  <img src="docs/screenshots/04-data.png" width="24%" alt="数据" />
+</p>
+
+<p align="center">
+  <sub>概览 · 账号池 · 任务队列 · 用量统计（截图内账号信息已脱敏）</sub>
+</p>
+
 ## 功能范围
 
 | 模块 | 能力 |
