@@ -69,45 +69,56 @@ def redact(img: Image.Image, blocks: list) -> Image.Image:
 
 
 def frame(img: Image.Image) -> Image.Image:
-    """套一层手机外框（黑边 + 灵动岛），带柔和投影，透明底。"""
-    target_w = 780
+    """套一层接近实机的 iPhone 外框：窄边、金属描边、侧键、灵动岛、双层投影。"""
+    target_w = 720
     ratio = target_w / img.width
     shot = img.resize((target_w, int(img.height * ratio)), Image.LANCZOS)
     w, h = shot.size
 
-    pad = BEZEL + 18
-    canvas = Image.new("RGBA", (w + pad * 2, h + pad * 2 + 24), (0, 0, 0, 0))
+    bezel = 11                 # 窄边框
+    screen_radius = 92
+    frame_radius = screen_radius + bezel
+    margin = 54
 
-    # 投影
-    shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    sd = ImageDraw.Draw(shadow)
-    sd.rounded_rectangle(
-        [pad - 6, pad + 16, pad + w + 6, pad + h + 22],
-        radius=RADIUS, fill=(20, 16, 40, 90),
-    )
-    shadow = shadow.filter(ImageFilter.GaussianBlur(22))
-    canvas = Image.alpha_composite(canvas, shadow)
+    canvas = Image.new("RGBA", (w + bezel * 2 + margin * 2, h + bezel * 2 + margin * 2), (0, 0, 0, 0))
+    ox, oy = margin, margin
+    fx0, fy0 = ox, oy
+    fx1, fy1 = ox + w + bezel * 2, oy + h + bezel * 2
+
+    # 远投影 + 近投影
+    for blur, alpha, dy in ((34, 55, 22), (10, 45, 6)):
+        layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        ld = ImageDraw.Draw(layer)
+        ld.rounded_rectangle([fx0 + 2, fy0 + dy + 2, fx1 - 2, fy1 + dy], radius=frame_radius, fill=(18, 14, 40, alpha))
+        canvas = Image.alpha_composite(canvas, layer.filter(ImageFilter.GaussianBlur(blur)))
 
     d = ImageDraw.Draw(canvas)
-    d.rounded_rectangle(
-        [pad - BEZEL, pad - BEZEL, pad + w + BEZEL, pad + h + BEZEL],
-        radius=RADIUS + BEZEL, fill=(16, 16, 18, 255),
-    )
-    d.rounded_rectangle(
-        [pad - 6, pad - 6, pad + w + 6, pad + h + 6],
-        radius=RADIUS + 6, outline=(58, 58, 66, 255), width=3,
-    )
 
-    # 圆角裁切屏幕
+    # 侧键（细窄，压在机身下）
+    btn = (74, 74, 78, 255)
+    d.rounded_rectangle([fx0 - 5, fy0 + 132, fx0, fy0 + 176], radius=3, fill=btn)
+    d.rounded_rectangle([fx0 - 5, fy0 + 208, fx0, fy0 + 292], radius=3, fill=btn)
+    d.rounded_rectangle([fx0 - 5, fy0 + 312, fx0, fy0 + 396], radius=3, fill=btn)
+    d.rounded_rectangle([fx1, fy0 + 232, fx1 + 5, fy0 + 336], radius=3, fill=btn)
+
+    # 金属中框（外圈渐变感：两层描边）
+    d.rounded_rectangle([fx0, fy0, fx1, fy1], radius=frame_radius, fill=(28, 28, 30, 255))
+    d.rounded_rectangle([fx0, fy0, fx1, fy1], radius=frame_radius, outline=(126, 126, 134, 255), width=2)
+    d.rounded_rectangle([fx0 + 2, fy0 + 2, fx1 - 2, fy1 - 2], radius=frame_radius - 2, outline=(58, 58, 62, 255), width=2)
+    d.rounded_rectangle([fx0 + bezel - 1, fy0 + bezel - 1, fx1 - bezel + 1, fy1 - bezel + 1],
+                        radius=screen_radius + 1, fill=(0, 0, 0, 255))
+
+    # 屏幕
     mask = Image.new("L", shot.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], radius=RADIUS, fill=255)
-    canvas.paste(shot, (pad, pad), mask)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w, h], radius=screen_radius, fill=255)
+    canvas.paste(shot, (fx0 + bezel, fy0 + bezel), mask)
 
-    # 灵动岛
-    island_w, island_h = int(w * 0.30), 34
-    ix = pad + (w - island_w) // 2
-    d.rounded_rectangle([ix, pad + 14, ix + island_w, pad + 14 + island_h],
-                        radius=island_h // 2, fill=(0, 0, 0, 255))
+    # 灵动岛 + 摄像头
+    island_w, island_h = int(w * 0.255), 26
+    ix = fx0 + bezel + (w - island_w) // 2
+    iy = fy0 + bezel + 11
+    d.rounded_rectangle([ix, iy, ix + island_w, iy + island_h], radius=island_h // 2, fill=(0, 0, 0, 255))
+    d.ellipse([ix + island_w - 22, iy + 7, ix + island_w - 11, iy + 18], fill=(26, 26, 30, 255))
     return canvas
 
 

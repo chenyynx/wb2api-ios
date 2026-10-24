@@ -13,14 +13,11 @@
 ## 界面
 
 <p align="center">
-  <img src="docs/screenshots/01-overview.png" width="24%" alt="概览" />
-  <img src="docs/screenshots/02-accounts.png" width="24%" alt="账号" />
-  <img src="docs/screenshots/03-tasks.png" width="24%" alt="任务" />
-  <img src="docs/screenshots/04-data.png" width="24%" alt="数据" />
+  <img src="docs/screenshots/hero.png" alt="界面预览：概览 / 账号 / 任务 / 数据 / 更多" />
 </p>
 
 <p align="center">
-  <sub>概览 · 账号池 · 任务队列 · 用量统计（截图内账号信息已脱敏）</sub>
+  <sub>概览 · 账号池 · 任务队列 · 用量统计 · 更多（截图内账号信息已脱敏）</sub>
 </p>
 
 ## 功能范围
