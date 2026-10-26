@@ -27,3 +27,11 @@ struct ConfigField: Identifiable, Equatable {
         }
     }
 }
+
+/// 一组「未被原生分区接管」的原始配置。
+struct ConfigGroup: Identifiable {
+    let key: String
+    let fields: [ConfigField]
+
+    var id: String { key }
+}

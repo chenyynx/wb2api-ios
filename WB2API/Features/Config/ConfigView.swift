@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 配置：按顶层 key 分组的原生表单 + 高级 JSON 编辑。
+/// 配置：网页端同款中文分区 + 未映射键的原始表单 + 高级 JSON 编辑。
 struct ConfigView: View {
     @Environment(SessionStore.self) private var session
     @State private var editor = ConfigEditor()
@@ -39,17 +39,46 @@ struct ConfigView: View {
                     }
                 } header: {
                     Text("概览")
+                } footer: {
+                    if editor.hasInvalidFields {
+                        Label(invalidFieldSummary, systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                    }
                 }
 
-                ForEach(editor.topLevelKeys, id: \.self) { key in
+                ForEach(ConfigSchema.sections) { section in
                     Section {
-                        ForEach(editor.fields(in: key)) { field in
-                            ConfigFieldView(field: field) { newValue in
-                                editor.set(newValue, for: field)
-                            }
+                        ForEach(section.fields) { spec in
+                            ConfigFieldRow(
+                                spec: spec,
+                                value: editor.value(at: spec.path),
+                                onChange: { newValue in
+                                    editor.setValue(newValue, at: spec.path)
+                                },
+                                onValidityChange: { isValid in
+                                    editor.setInvalid(spec.id, !isValid)
+                                }
+                            )
+                            .disabled(spec.id == "api_key" && editor.apiKeyEnvManaged)
                         }
                     } header: {
-                        Text(key)
+                        Text(section.title)
+                    } footer: {
+                        if let footer = section.footer {
+                            Text(footer)
+                        }
+                    }
+                }
+
+                if !otherGroups.isEmpty {
+                    Section {
+                        NavigationLink {
+                            OtherConfigView(editor: editor)
+                        } label: {
+                            LabeledContent("其他原始配置", value: "\(otherGroups.count) 组")
+                        }
+                    } footer: {
+                        Text("网页端未做中文映射的键保留在这里，不会丢配置。")
                     }
                 }
 
@@ -73,7 +102,7 @@ struct ConfigView: View {
                         .accessibilityLabel("正在保存")
                 } else {
                     Button("保存", action: save)
-                        .disabled(!editor.isDirty)
+                        .disabled(!editor.isDirty || editor.hasInvalidFields)
                 }
             }
         }
@@ -81,6 +110,27 @@ struct ConfigView: View {
             AdvancedJSONView(editor: editor)
         }
         .toast($toast)
+    }
+
+    // MARK: - 派生
+
+    private var otherGroups: [ConfigGroup] {
+        editor.uncuratedGroups(excluding: ConfigSchema.curatedPaths)
+    }
+
+    private var invalidFieldSummary: String {
+        let labels = editor.invalidFieldIDs
+            .compactMap { ConfigSchema.label(forFieldID: $0) }
+            .sorted()
+        guard !labels.isEmpty else { return "有字段格式不正确，修正后才能保存" }
+        return "格式不正确：\(labels.joined(separator: "、"))"
+    }
+
+    /// 已有密钥却被清空 = 会把网关改成无鉴权公开服务，直接拦住。
+    private var wouldDisableAuth: Bool {
+        let old = editor.original.objectValue?["api_key"]?.stringValue ?? ""
+        let new = editor.value(at: ["api_key"]).stringValue ?? ""
+        return !old.isEmpty && new.isEmpty
     }
 
     // MARK: - 动作
@@ -108,6 +158,14 @@ struct ConfigView: View {
 
     private func performSave() async {
         guard let client = session.client() else { return }
+        guard !editor.hasInvalidFields else {
+            toast = Toast(kind: .failure, text: "有字段格式不正确，修正后再保存")
+            return
+        }
+        guard !wouldDisableAuth else {
+            toast = Toast(kind: .failure, text: "API 密钥不能为空（清空会关闭网关鉴权）")
+            return
+        }
         isSaving = true
         defer { isSaving = false }
         do {
