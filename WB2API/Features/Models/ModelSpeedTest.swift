@@ -167,10 +167,12 @@ final class ModelSpeedRunner {
             )
             states[modelID] = .success
             persist()
-        } catch is CancellationError {
-            states[modelID] = .idle
         } catch {
-            states[modelID] = .failed((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
+            if error.isCancellation {
+                states[modelID] = .idle
+            } else {
+                states[modelID] = .failed((error as? LocalizedError)?.errorDescription ?? error.localizedDescription)
+            }
         }
     }
 

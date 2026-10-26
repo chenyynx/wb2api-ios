@@ -8,6 +8,7 @@ struct ModelSpeedTestView: View {
     @State private var searchText = ""
     @State private var sortBySpeed = false
     @State private var didAutoStart = false
+    @State private var showRunConfirm = false
 
     /// 从模型详情进来时，打开页面直接测这一个模型。
     private let focus: ModelInfo?
@@ -51,6 +52,7 @@ struct ModelSpeedTestView: View {
         .searchable(text: $searchText, prompt: "搜索模型 ID 或描述")
         .refreshable { await load(force: true) }
         .task { await load() }
+        .onDisappear { runner.stop() }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
@@ -63,6 +65,14 @@ struct ModelSpeedTestView: View {
                 }
                 .accessibilityLabel("排序方式")
             }
+        }
+        .confirmationDialog("开始全部测速？", isPresented: $showRunConfirm, titleVisibility: .visible) {
+            Button("测 \(allModels.count) 个模型") {
+                runner.startAll()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("每个模型会发一次最多 \(ModelSpeedRunner.maxTokens) tokens 的请求，会消耗少量积分。")
         }
     }
 
@@ -138,7 +148,7 @@ struct ModelSpeedTestView: View {
         } header: {
             Text("测速")
         } footer: {
-            Text("会真实消耗少量积分；tok/s 只算首字之后，TTFB 单独展示。结果保存在本机。")
+            Text("会真实消耗少量积分；tok/s 只算首字之后，TTFB 单独展示。结果保存在本机，离开页面会停止测速。")
         }
     }
 
@@ -204,7 +214,7 @@ struct ModelSpeedTestView: View {
         if runner.isRunning {
             runner.stop()
         } else {
-            runner.startAll()
+            showRunConfirm = true
         }
     }
 
@@ -247,7 +257,7 @@ private struct ModelSpeedTestRow: View {
 
             Spacer(minLength: 0)
 
-            if let result {
+            if let result, showsResult {
                 VStack(alignment: .trailing, spacing: 0) {
                     Text(result.tokensPerSecond, format: .number.precision(.fractionLength(1)))
                         .font(.title3.bold())
@@ -270,6 +280,13 @@ private struct ModelSpeedTestRow: View {
             .accessibilityLabel("测试 \(model.displayID) 的输出速度")
         }
         .padding(.vertical, 2)
+    }
+
+    private var showsResult: Bool {
+        switch state {
+        case .running, .failed: return false
+        case .success, .idle: return true
+        }
     }
 
     @ViewBuilder
