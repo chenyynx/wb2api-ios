@@ -143,7 +143,7 @@ final class ModelSpeedRunner {
                     if firstTokenAt == nil { firstTokenAt = Date() }
                     approximateTokens += 1
                 }
-                if let tokens = chunk.completionTokens {
+                if let tokens = chunk.completionTokens, tokens > 0 {
                     usageTokens = tokens
                 }
             }
