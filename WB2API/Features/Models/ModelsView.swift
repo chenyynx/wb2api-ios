@@ -21,6 +21,28 @@ struct ModelsView: View {
             }
 
             Section {
+                NavigationLink {
+                    ModelSpeedTestView()
+                } label: {
+                    HStack(spacing: Metrics.m) {
+                        Image(systemName: "speedometer")
+                            .font(.title3)
+                            .foregroundStyle(Accent.primary)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("输出速度测试")
+                                .font(.callout.bold())
+                            Text("逐个测每个模型的 tok/s 与首字延迟")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            } footer: {
+                Text("固定 prompt、串行测试，会消耗少量积分。")
+            }
+
+            Section {
                 if isInitialLoading {
                     LoadingSkeleton(rows: 6)
                         .listRowBackground(Color.clear)

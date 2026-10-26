@@ -80,6 +80,11 @@ enum Fmt {
     /// 相对时间：刚刚 / 3 分钟前 / 2 小时前 / 昨天 / 10-21
     static func ago(_ raw: String?, now: Date = Date()) -> String {
         guard let date = parse(raw) else { return "—" }
+        return ago(date, now: now)
+    }
+
+    /// 本地 Date 的相对时间（测速结果等客户端生成的时间）。
+    static func ago(_ date: Date, now: Date = Date()) -> String {
         let delta = now.timeIntervalSince(date)
         if delta < 60 { return "刚刚" }
         if delta < 3600 { return "\(Int(delta / 60)) 分钟前" }

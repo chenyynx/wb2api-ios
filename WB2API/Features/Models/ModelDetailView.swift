@@ -14,5 +14,14 @@ struct ModelDetailView: View {
         }
         .navigationTitle(model.displayID)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    ModelSpeedTestView(focus: model)
+                } label: {
+                    Label("测速", systemImage: "speedometer")
+                }
+            }
+        }
     }
 }

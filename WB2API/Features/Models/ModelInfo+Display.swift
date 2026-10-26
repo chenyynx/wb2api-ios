@@ -17,6 +17,11 @@ extension ModelInfo {
         modelId ?? name ?? "未命名模型"
     }
 
+    /// 真正发给 `/v1/chat/completions` 的模型标识。
+    var requestID: String {
+        modelId ?? name ?? ""
+    }
+
     /// `credits` 是 "x0.79" 这类倍率字符串，拆成数值用于排版与数字滚动。
     var creditMultiplier: Double? {
         guard let credits else { return nil }

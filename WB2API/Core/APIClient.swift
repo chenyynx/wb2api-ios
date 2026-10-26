@@ -124,6 +124,70 @@ struct APIClient: Sendable {
         let req = try request(path: path, method: "POST", query: query, body: nil)
         return try await execute(req)
     }
+
+    // MARK: 流式聊天（模型测速）
+
+    /// 流式调用 `/v1/chat/completions`，把 SSE 解析成增量事件。
+    ///
+    /// 只用于「模型输出速度」测试：固定 prompt、小 max_tokens，避免影响正常业务。
+    func streamChat(
+        model: String,
+        prompt: String,
+        maxTokens: Int,
+        temperature: Double = 0.6
+    ) -> AsyncThrowingStream<ChatStreamChunk, Error> {
+        AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    let body: [String: Any] = [
+                        "model": model,
+                        "messages": [["role": "user", "content": prompt]],
+                        "max_tokens": maxTokens,
+                        "temperature": temperature,
+                        "stream": true,
+                        "stream_options": ["include_usage": true]
+                    ]
+                    let payload = try JSONSerialization.data(withJSONObject: body)
+                    let req = try request(path: "v1/chat/completions", method: "POST", query: [], body: payload, timeout: 180)
+                    let (bytes, response) = try await session.bytes(for: req)
+
+                    guard let http = response as? HTTPURLResponse else {
+                        throw APIError.transport("无 HTTP 响应")
+                    }
+                    if http.statusCode == 401 { throw APIError.unauthorized }
+                    guard (200..<300).contains(http.statusCode) else {
+                        var raw = Data()
+                        for try await byte in bytes {
+                            raw.append(byte)
+                            if raw.count >= 2048 { break }
+                        }
+                        let message = String(data: raw, encoding: .utf8) ?? ""
+                        throw APIError.http(http.statusCode, Self.humanMessage(message, code: http.statusCode))
+                    }
+
+                    for try await line in bytes.lines {
+                        try Task.checkCancellation()
+                        guard let event = ChatStreamParser.parse(line: line) else { continue }
+                        switch event {
+                        case .chunk(let chunk):
+                            continuation.yield(chunk)
+                        case .done:
+                            continuation.finish()
+                            return
+                        case .failure(let message):
+                            throw APIError.transport(message)
+                        }
+                    }
+                    continuation.finish()
+                } catch is CancellationError {
+                    continuation.finish(throwing: CancellationError())
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
 }
 
 /// 类型擦除，用于可选 body。
