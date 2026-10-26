@@ -67,8 +67,8 @@ struct ModelSpeedTestView: View {
             }
         }
         .confirmationDialog("开始全部测速？", isPresented: $showRunConfirm, titleVisibility: .visible) {
-            Button("测 \(allModels.count) 个模型") {
-                runner.startAll()
+            Button("测 \(visibleModels.count) 个模型") {
+                runner.startAll(visibleModels)
             }
             Button("取消", role: .cancel) {}
         } message: {
@@ -171,7 +171,7 @@ struct ModelSpeedTestView: View {
                     .monospacedDigit()
             }
         } footer: {
-            Text("点右侧 ▶ 单独测；全部测速会按当前顺序逐个跑。")
+            Text("点右侧 ▶ 单独测；全部测速会按当前列表顺序逐个跑。")
         }
     }
 

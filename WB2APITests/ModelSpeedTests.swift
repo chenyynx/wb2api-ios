@@ -19,6 +19,14 @@ final class ModelSpeedTests: XCTestCase {
         )
     }
 
+    func testParseArrayContentChunk() {
+        let line = #"data: {"choices":[{"delta":{"content":[{"type":"text","text":"你"},{"type":"text","text":"好"}]}}]}"#
+        XCTAssertEqual(
+            ChatStreamParser.parse(line: line),
+            .chunk(ChatStreamChunk(text: "你好", completionTokens: nil))
+        )
+    }
+
     func testParseUsageChunk() {
         let line = #"data: {"choices":[],"usage":{"completion_tokens":128}}"#
         XCTAssertEqual(

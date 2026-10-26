@@ -36,6 +36,9 @@ enum ChatStreamParser {
            let delta = choices.first?["delta"] as? [String: Any] {
             if let content = delta["content"] as? String, !content.isEmpty {
                 text = content
+            } else if let parts = delta["content"] as? [[String: Any]] {
+                let joined = parts.compactMap { $0["text"] as? String }.joined()
+                if !joined.isEmpty { text = joined }
             } else if let reasoning = (delta["reasoning_content"] as? String) ?? (delta["reasoning"] as? String),
                       !reasoning.isEmpty {
                 // 推理模型的可见正文可能是空的，思考 token 同样算输出速度。

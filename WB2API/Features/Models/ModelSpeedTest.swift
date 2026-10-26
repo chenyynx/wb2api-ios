@@ -72,16 +72,16 @@ final class ModelSpeedRunner {
 
     // MARK: 运行
 
-    func startAll() {
-        guard !isRunning, !models.isEmpty else { return }
+    func startAll(_ list: [ModelInfo]? = nil) {
+        let targets = list ?? models
+        guard !isRunning, !targets.isEmpty else { return }
         isRunning = true
         completed = 0
-        total = models.count
+        total = targets.count
 
-        let models = self.models
         runTask = Task { [weak self] in
             guard let self else { return }
-            for model in models {
+            for model in targets {
                 if Task.isCancelled { break }
                 await self.measure(model)
                 if Task.isCancelled { break }
