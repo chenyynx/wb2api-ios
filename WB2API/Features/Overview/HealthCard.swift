@@ -22,8 +22,19 @@ struct HealthCard: View {
         if digest.disabled > 0 {
             items.append(StatusLine(id: 1, icon: "person.badge.key.fill", text: digest.disabledLine, tint: .red))
         }
-        if digest.inFlightFull {
-            items.append(StatusLine(id: 2, icon: "exclamationmark.triangle.fill", text: "并发已满，新请求会排队", tint: .orange))
+        if digest.inFlightFullCount > 0 {
+            // 后端 in_flight_full 是「健康账号里在途名额已占满的个数」，不是布尔量：
+            // 只有全部可用账号都满载（count >= healthy）时新请求才真的要等空位；
+            // 部分满载只是调度分布，其余账号照常接单，不该报成服务异常。
+            let saturated = digest.inFlightFullCount >= digest.healthy
+            items.append(StatusLine(
+                id: 2,
+                icon: saturated ? "exclamationmark.triangle.fill" : "gauge.with.dots.needle.67percent",
+                text: saturated
+                    ? "并发已满 · \(digest.inFlightFullCount)/\(digest.healthy) 个账号在途占满，新请求需等待"
+                    : "\(digest.inFlightFullCount)/\(digest.healthy) 个账号并发已满，其余可接新请求",
+                tint: saturated ? .orange : .secondary
+            ))
         }
         if items.isEmpty {
             // 没有异常时不留空：换成当天用量与积分到期这类有信息量的摘要。

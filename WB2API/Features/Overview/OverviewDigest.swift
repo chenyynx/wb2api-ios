@@ -19,7 +19,9 @@ struct OverviewDigest: Equatable, Sendable {
     /// 最近一批积分到期："11-21 · 剩 4,700"
     let earliestExpiry: String?
     let successRate: Double?
-    let inFlightFull: Bool
+    /// 在途并发已占满的账号数（后端 `in_flight_full`，是 `healthy` 的子集；
+    /// 只有全部可用账号都占满才意味着新请求真的要等空位）。
+    let inFlightFullCount: Int
     let earliestRecovery: String?
     /// 今日消耗 tokens（由 usage 小时桶聚合；无数据为 nil）
     let todayTokens: Int?
@@ -35,7 +37,7 @@ struct OverviewDigest: Equatable, Sendable {
         cacheHitRate = usage?.totals?.cacheHitRate
         avgLatencyMs = usage?.totals?.avgLatencyMs
         earliestExpiry = Self.earliestExpiryText(in: accounts)
-        inFlightFull = overview.isInFlightFull
+        inFlightFullCount = overview.inFlightFull ?? 0
 
         let successes = accounts.compactMap(\.successCount).reduce(0, +)
         successRate = requests > 0 ? min(Double(successes) / Double(requests), 1) : nil
