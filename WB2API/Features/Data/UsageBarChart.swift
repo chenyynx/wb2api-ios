@@ -7,6 +7,8 @@ struct UsageBarChart: View {
     let groups: [UsageGroup]
     var limit: Int = 8
 
+    @ScaledMetric(relativeTo: .caption) private var rowHeight: CGFloat = 40
+
     private var items: [UsageGroup] {
         Array(groups.prefix(limit))
     }
@@ -54,7 +56,7 @@ struct UsageBarChart: View {
                 .chartXAxis(.hidden)
                 .chartLegend(.hidden)
                 .chartXScale(domain: 0...xUpperBound)
-                .frame(height: CGFloat(items.count) * 40 + Metrics.l)
+                .frame(height: CGFloat(items.count) * rowHeight + Metrics.l)
                 .motion(Motion.numeric, value: items.map(\.id))
                 .accessibilityLabel(title)
             }
