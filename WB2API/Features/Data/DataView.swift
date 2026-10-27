@@ -14,8 +14,11 @@ struct DataView: View {
                     UsageRangePicker(selection: $range)
                         .onChange(of: range) { _, newValue in changeRange(newValue) }
 
-                    UsageRangeSummaryCard(range: range, totals: loader.value?.totals)
+                    TodayUsageCard(today: today, isLoading: loader.isLoading && loader.value == nil)
                         .staggeredAppear(index: 0)
+
+                    UsageRangeSummaryCard(range: range, totals: loader.value?.totals)
+                        .staggeredAppear(index: 1)
 
                     Picker("统计维度", selection: $dimension) {
                         ForEach(UsageDimension.allCases) { item in
@@ -33,7 +36,7 @@ struct DataView: View {
                         LoadingSkeleton(rows: 5)
                     } else if let snapshot = loader.value {
                         UsageTotalsGrid(totals: snapshot.totals)
-                            .staggeredAppear(index: 1)
+                            .staggeredAppear(index: 2)
 
                         if dimension.groups(in: snapshot).isEmpty {
                             ContentUnavailableView {
@@ -47,7 +50,7 @@ struct DataView: View {
                                 title: dimension.chartTitle,
                                 groups: dimension.groups(in: snapshot)
                             )
-                            .staggeredAppear(index: 1)
+                            .staggeredAppear(index: 2)
                             .scrollTransition(.interactive, axis: .vertical) { content, phase in
                                 content
                                     .opacity(phase.isIdentity ? 1 : 0.6)
@@ -68,7 +71,7 @@ struct DataView: View {
                 }
                 .padding(Metrics.m)
                 .animation(Motion.numeric, value: dimension)
-            .animation(Motion.numeric, value: range)
+                .animation(Motion.numeric, value: range)
             }
             .background(.background)
             .navigationTitle("数据")
@@ -87,6 +90,13 @@ struct DataView: View {
                 }
             }
         }
+    }
+
+    // MARK: - 派生
+
+    private var today: UsageTodayTotals? {
+        guard let snapshot = loader.value else { return nil }
+        return UsageToday.totals(in: snapshot)
     }
 
     // MARK: - 动作
