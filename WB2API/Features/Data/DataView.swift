@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 「数据」Tab：用量总览（按账号 / 模型 / 域），并通往积分与余额历史。
+/// 「数据」Tab：一张主摘要卡 + 分组条形图 + 历史入口。
 struct DataView: View {
     @Environment(SessionStore.self) private var session
     @State private var loader = Loader<UsageSnapshot>()
@@ -10,57 +10,26 @@ struct DataView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: Metrics.l) {
+                LazyVStack(alignment: .leading, spacing: Metrics.l) {
                     UsageRangePicker(selection: $range)
-                        .onChange(of: range) { _, newValue in changeRange(newValue) }
-
-                    TodayUsageCard(today: today, isLoading: loader.isLoading && loader.value == nil)
-                        .staggeredAppear(index: 0)
-
-                    UsageRangeSummaryCard(range: range, totals: loader.value?.totals)
-                        .staggeredAppear(index: 1)
-
-                    Picker("统计维度", selection: $dimension) {
-                        ForEach(UsageDimension.allCases) { item in
-                            Text(item.title).tag(item)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityLabel("统计维度")
 
                     if let error = loader.error {
                         ErrorBanner(message: error, retry: retry)
                     }
 
-                    if loader.isLoading && loader.value == nil {
-                        LoadingSkeleton(rows: 5)
+                    DataUsageSummaryCard(
+                        range: range,
+                        totals: loader.value?.totals,
+                        today: today,
+                        isLoading: isInitialLoading
+                    )
+
+                    if isInitialLoading {
+                        LoadingSkeleton(rows: 4)
                     } else if let snapshot = loader.value {
-                        UsageTotalsGrid(totals: snapshot.totals)
-                            .staggeredAppear(index: 2)
-
-                        if dimension.groups(in: snapshot).isEmpty {
-                            ContentUnavailableView {
-                                Label("暂无分组数据", systemImage: "chart.bar")
-                            } description: {
-                                Text(dimension.emptyDescription)
-                            }
-                            .glassCard()
-                        } else {
-                            UsageBarChart(
-                                title: dimension.chartTitle,
-                                groups: dimension.groups(in: snapshot)
-                            )
-                            .staggeredAppear(index: 2)
-                            .scrollTransition(.interactive, axis: .vertical) { content, phase in
-                                content
-                                    .opacity(phase.isIdentity ? 1 : 0.6)
-                                    .scaleEffect(phase.isIdentity ? 1 : 0.98)
-                            }
-                        }
-
+                        DataBreakdownSection(dimension: $dimension, snapshot: snapshot)
                         DataHistoryLinks()
-                            .staggeredAppear(index: 3)
-                    } else {
+                    } else if loader.error == nil {
                         ContentUnavailableView {
                             Label("暂无用量数据", systemImage: "chart.bar.xaxis")
                         } description: {
@@ -69,14 +38,23 @@ struct DataView: View {
                         .glassCard()
                     }
                 }
-                .padding(Metrics.m)
-                .animation(Motion.numeric, value: dimension)
-                .animation(Motion.numeric, value: range)
+                .padding(.horizontal, Metrics.m)
+                .padding(.top, Metrics.s)
+                .padding(.bottom, Metrics.tabBarClearance)
+            }
+            .scrollIndicators(.hidden)
+            .background {
+                LinearGradient(
+                    colors: [Accent.soft.opacity(0.7), Color.clear],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+                .ignoresSafeArea()
             }
             .background(.background)
             .navigationTitle("数据")
             .refreshable { await load() }
-            .task { await load() }
+            .task(id: range) { await load() }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("刷新", systemImage: "arrow.clockwise", action: refresh)
@@ -94,6 +72,10 @@ struct DataView: View {
 
     // MARK: - 派生
 
+    private var isInitialLoading: Bool {
+        loader.isLoading && loader.value == nil
+    }
+
     private var today: UsageTodayTotals? {
         guard let snapshot = loader.value else { return nil }
         return UsageToday.totals(in: snapshot)
@@ -104,15 +86,10 @@ struct DataView: View {
     private func load() async {
         guard let client = session.client() else { return }
         let hours = range.hours
-        await loader.load { try await client.usage(hours: hours) }
+        await loader.load(force: true) { try await client.usage(hours: hours) }
     }
 
     private func refresh() {
-        Task { await load() }
-    }
-
-    /// 切区间 = 换一组数据，重新拉（range 已被 onChange 赋值）。
-    private func changeRange(_ newValue: UsageRange) {
         Task { await load() }
     }
 

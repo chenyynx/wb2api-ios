@@ -48,6 +48,9 @@ enum Metrics {
     static let radiusM: CGFloat = 16
     static let radiusL: CGFloat = 22
     static let radiusXL: CGFloat = 28
+
+    /// 悬浮 Tab 栏下方的滚动留白，避免最后一张卡片被盖住。
+    static let tabBarClearance: CGFloat = 96
 }
 
 // MARK: - 字体（只用系统文本样式，Dynamic Type 自动生效）

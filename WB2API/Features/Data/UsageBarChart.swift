@@ -19,10 +19,15 @@ struct UsageBarChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.m) {
-            SectionHeader(
-                title: title,
-                subtitle: items.isEmpty ? nil : "共 \(groups.count) 项 · 取前 \(items.count) 项"
-            )
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                if !items.isEmpty {
+                    Text("共 \(groups.count) 项 · 取前 \(items.count) 项")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
 
             if items.isEmpty {
                 ContentUnavailableView {
@@ -50,7 +55,7 @@ struct UsageBarChart: View {
                 .chartLegend(.hidden)
                 .chartXScale(domain: 0...xUpperBound)
                 .frame(height: CGFloat(items.count) * 40 + Metrics.l)
-                .animation(Motion.numeric, value: items.map(\.id))
+                .motion(Motion.numeric, value: items.map(\.id))
                 .accessibilityLabel(title)
             }
         }
