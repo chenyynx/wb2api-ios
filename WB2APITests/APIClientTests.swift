@@ -74,6 +74,19 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(comps?.queryItems?.first(where: { $0.name == "days" })?.value, "7")
     }
 
+    func testUsageExplicitWindowSendsFromTo() async throws {
+        stub(body: try Fixture.data("usage"))
+        let from = Date(timeIntervalSince1970: 1_700_000_000)
+        let to = Date(timeIntervalSince1970: 1_700_086_400)
+        _ = try await client.usage(from: from, to: to)
+
+        let request = try XCTUnwrap(StubURLProtocol.lastRequest)
+        let comps = URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false)
+        XCTAssertEqual(comps?.path, "/panel/api/usage")
+        XCTAssertEqual(comps?.queryItems?.first(where: { $0.name == "from" })?.value, "1700000000")
+        XCTAssertEqual(comps?.queryItems?.first(where: { $0.name == "to" })?.value, "1700086400")
+    }
+
     func testUnauthorizedMapsToUnauthorizedError() async throws {
         stub(401, body: Data("denied".utf8))
         do {

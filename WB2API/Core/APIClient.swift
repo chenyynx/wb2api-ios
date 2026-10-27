@@ -255,12 +255,22 @@ extension APIClient {
         try await get("\(Self.apiPrefix)/tasks/jobs")
     }
 
-    /// 用量快照。hours 缺省 72；后端最大 1440（60 天），用于区间统计。
+    /// 用量快照。hours 缺省 72；后端最大 1440（60 天），用于滚动区间统计。
     func usage(hours: Int? = nil) async throws -> UsageSnapshot {
         var query: [URLQueryItem] = []
         if let hours, hours > 0 {
             query = [URLQueryItem(name: "hours", value: String(min(hours, 1440)))]
         }
+        return try await get("\(Self.apiPrefix)/usage", query: query)
+    }
+
+    /// 显式区间（unix 秒）：今日/昨日按自然日过滤 totals、分组与时序。
+    /// 区间由客户端按东八区算好再发，避免服务端/设备时区不一致把「今天」算错。
+    func usage(from: Date, to: Date) async throws -> UsageSnapshot {
+        let query = [
+            URLQueryItem(name: "from", value: String(Int(from.timeIntervalSince1970))),
+            URLQueryItem(name: "to", value: String(Int(to.timeIntervalSince1970)))
+        ]
         return try await get("\(Self.apiPrefix)/usage", query: query)
     }
 

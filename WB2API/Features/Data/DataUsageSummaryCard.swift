@@ -1,15 +1,13 @@
 import SwiftUI
 
-/// 数据页主摘要：区间 tokens/请求/积分/日均 + 质量指标 + 今日消耗。
+/// 数据页主摘要：区间 tokens / 请求 / 积分 / 日均（单日显示平均速度）+ 质量指标。
 ///
-/// 把原先「区间卡 + 六格指标 + 今日卡」三块合成一张，避免重复数字和过长页面。
+/// 今日/昨日已经是区间选项，这里不再混入独立的今日卡。
 struct DataUsageSummaryCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let range: UsageRange
     let totals: UsageTotals?
-    let today: UsageTodayTotals?
-    let isLoading: Bool
     var isRefreshing = false
 
     private var tokens: Int? { totals?.totalTokens }
@@ -28,8 +26,21 @@ struct DataUsageSummaryCard: View {
         return Fmt.tokens(dailyTokens)
     }
 
+    private var speedText: String {
+        guard let speed = totals?.avgTokensPerSecond, speed > 0 else { return "—" }
+        return "\(speed.formatted(.number.precision(.fractionLength(0)))) tok/s"
+    }
+
     private var errorTint: Color {
         (errors ?? 0) > 0 ? .orange : .primary
+    }
+
+    private var cardTitle: String {
+        switch range {
+        case .today: return "今日消耗"
+        case .yesterday: return "昨日消耗"
+        default: return "区间消耗"
+        }
     }
 
     /// 普通字号三列；辅助功能字号两列，避免数值被压得太小。
@@ -42,7 +53,7 @@ struct DataUsageSummaryCard: View {
         VStack(alignment: .leading, spacing: Metrics.m) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("区间消耗")
+                    Text(cardTitle)
                         .font(.headline)
                     Text(range.subtitle)
                         .font(.footnote)
@@ -72,15 +83,14 @@ struct DataUsageSummaryCard: View {
             LazyVGrid(columns: metricColumns, alignment: .leading, spacing: Metrics.m) {
                 DataMetricCell(title: "请求", value: Fmt.compact(requests))
                 DataMetricCell(title: "积分", value: Fmt.creditsDouble(credits))
-                DataMetricCell(title: "日均", value: dailyText)
+                DataMetricCell(
+                    title: range.isSingleDay ? "平均速度" : "日均",
+                    value: range.isSingleDay ? speedText : dailyText
+                )
                 DataMetricCell(title: "错误数", value: Fmt.compact(errors), tint: errorTint)
                 DataMetricCell(title: "平均延迟", value: Fmt.latency(totals?.avgLatencyMs))
                 DataMetricCell(title: "缓存命中", value: Fmt.rate(totals?.cacheHitRate))
             }
-
-            Divider()
-
-            TodayUsageSection(today: today, isLoading: isLoading)
         }
         .padding(Metrics.m)
         .glassCard(padding: 0, cornerRadius: Metrics.radiusL)

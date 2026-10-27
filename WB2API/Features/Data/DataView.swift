@@ -20,8 +20,6 @@ struct DataView: View {
                     DataUsageSummaryCard(
                         range: range,
                         totals: loader.value?.totals,
-                        today: today,
-                        isLoading: isInitialLoading,
                         isRefreshing: loader.isLoading
                     )
 
@@ -77,17 +75,19 @@ struct DataView: View {
         loader.isLoading && loader.value == nil
     }
 
-    private var today: UsageTodayTotals? {
-        guard let snapshot = loader.value else { return nil }
-        return UsageToday.totals(in: snapshot)
-    }
-
     // MARK: - 动作
 
     private func load() async {
         guard let client = session.client() else { return }
-        let hours = range.hours
-        await loader.load(force: true) { try await client.usage(hours: hours) }
+        if let window = range.window() {
+            await loader.load(force: true) {
+                try await client.usage(from: window.from, to: window.to)
+            }
+        } else {
+            await loader.load(force: true) {
+                try await client.usage(hours: range.hours)
+            }
+        }
     }
 
     private func refresh() {
