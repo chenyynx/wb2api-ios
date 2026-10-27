@@ -4,6 +4,8 @@ import SwiftUI
 ///
 /// 把原先「区间卡 + 六格指标 + 今日卡」三块合成一张，避免重复数字和过长页面。
 struct DataUsageSummaryCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let range: UsageRange
     let totals: UsageTotals?
     let today: UsageTodayTotals?
@@ -29,6 +31,12 @@ struct DataUsageSummaryCard: View {
         (errors ?? 0) > 0 ? .orange : .primary
     }
 
+    /// 普通字号三列；辅助功能字号两列，避免数值被压得太小。
+    private var metricColumns: [GridItem] {
+        let count = dynamicTypeSize.isAccessibilitySize ? 2 : 3
+        return Array(repeating: GridItem(.flexible(), spacing: Metrics.s, alignment: .leading), count: count)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.m) {
             VStack(alignment: .leading, spacing: 2) {
@@ -52,19 +60,16 @@ struct DataUsageSummaryCard: View {
                 Spacer(minLength: 0)
             }
 
-            HStack(alignment: .top, spacing: Metrics.s) {
+            LazyVGrid(columns: metricColumns, alignment: .leading, spacing: Metrics.m) {
                 DataMetricCell(title: "请求", value: Fmt.compact(requests))
                 DataMetricCell(title: "积分", value: Fmt.creditsDouble(credits))
                 DataMetricCell(title: "日均", value: dailyText)
-            }
-
-            Divider()
-
-            HStack(alignment: .top, spacing: Metrics.s) {
                 DataMetricCell(title: "错误数", value: Fmt.compact(errors), tint: errorTint)
                 DataMetricCell(title: "平均延迟", value: Fmt.latency(totals?.avgLatencyMs))
                 DataMetricCell(title: "缓存命中", value: Fmt.rate(totals?.cacheHitRate))
             }
+
+            Divider()
 
             TodayUsageSection(today: today, isLoading: isLoading)
         }
