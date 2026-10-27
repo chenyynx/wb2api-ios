@@ -10,6 +10,7 @@ struct DataUsageSummaryCard: View {
     let totals: UsageTotals?
     let today: UsageTodayTotals?
     let isLoading: Bool
+    var isRefreshing = false
 
     private var tokens: Int? { totals?.totalTokens }
     private var requests: Int? { totals?.requests }
@@ -39,12 +40,20 @@ struct DataUsageSummaryCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.m) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("区间消耗")
-                    .font(.headline)
-                Text(range.subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("区间消耗")
+                        .font(.headline)
+                    Text(range.subtitle)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                if isRefreshing {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .accessibilityLabel("正在刷新用量")
+                }
             }
 
             HStack(alignment: .firstTextBaseline, spacing: Metrics.xs) {

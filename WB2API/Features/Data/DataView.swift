@@ -21,7 +21,8 @@ struct DataView: View {
                         range: range,
                         totals: loader.value?.totals,
                         today: today,
-                        isLoading: isInitialLoading
+                        isLoading: isInitialLoading,
+                        isRefreshing: loader.isLoading
                     )
 
                     if isInitialLoading {
