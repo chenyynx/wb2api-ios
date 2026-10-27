@@ -1,5 +1,8 @@
 # WB2API iOS
 
+> **最新安装包**：[WB2API-unsigned.ipa（1.3.0 · build 28）](https://github.com/chenyynx/wb2api-ios/releases/latest/download/WB2API-unsigned.ipa)
+> 未签名 IPA，需用全能签 / SideStore / AltStore 等工具重签后安装。
+
 [![CI](https://github.com/chenyynx/wb2api-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/chenyynx/wb2api-ios/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/iOS-26.0%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-6.0-orange)
