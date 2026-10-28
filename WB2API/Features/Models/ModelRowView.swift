@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 模型行：ID、倍率、上下文长度，默认/繁忙用语义标签。
 struct ModelRowView: View {
+    @Environment(\.appTheme) private var theme
+
     let model: ModelInfo
 
     var body: some View {
@@ -13,7 +15,7 @@ struct ModelRowView: View {
                     .minimumScaleFactor(0.85)
                 Spacer(minLength: 0)
                 if model.isDefault == true {
-                    StatusTag(text: "默认", systemImage: "star.fill", tint: Accent.primary)
+                    StatusTag(text: "默认", systemImage: "star.fill", tint: theme.primary)
                 }
                 if model.isBusy {
                     StatusTag(text: "繁忙", systemImage: "hourglass", tint: .orange)

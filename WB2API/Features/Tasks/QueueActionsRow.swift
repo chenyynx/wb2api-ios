@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 队列操作：执行队列（主）+ 扫描全部（次）+ 暂停（运行中时替代执行按钮）。
 struct QueueActionsRow: View {
+    @Environment(\.appTheme) private var theme
+
     let isScanning: Bool
     let isRunning: Bool
     var onScan: () -> Void
@@ -29,7 +31,7 @@ struct QueueActionsRow: View {
                     )
                 }
                 .buttonStyle(.glassProminent)
-                .tint(Accent.primary)
+                .tint(theme.primary)
                 .disabled(isScanning)
             }
 

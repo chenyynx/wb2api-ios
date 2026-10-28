@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 单条实时日志：通道徽标 + 时间 + 等宽正文，可长按选中复制。
 struct LogRowView: View {
+    @Environment(\.appTheme) private var theme
+
     let entry: LogEntry
 
     private let isWarning: Bool
@@ -20,7 +22,7 @@ struct LogRowView: View {
                     systemImage: LogChannel.systemImage(for: entry.ch)
                 )
                 .font(.tag)
-                .foregroundStyle(LogChannel.tint(for: entry.ch))
+                .foregroundStyle(LogChannel.tint(for: entry.ch, theme: theme))
 
                 if isWarning {
                     Image(systemName: "exclamationmark.triangle.fill")

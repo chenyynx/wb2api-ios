@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 「开源」页：仓库信息、构建指引与反馈渠道。
 struct AboutView: View {
+    @Environment(\.appTheme) private var theme
+
     private let repoURL = URL(string: "https://github.com/chenyynx/wb2api-ios")!
     private let issuesURL = URL(string: "https://github.com/chenyynx/wb2api-ios/issues")!
     private let releasesURL = URL(string: "https://github.com/chenyynx/wb2api-ios/releases")!
@@ -83,7 +85,7 @@ struct AboutView: View {
         Link(destination: url) {
             HStack(spacing: Metrics.m) {
                 Image(systemName: icon)
-                    .foregroundStyle(Accent.primary)
+                    .foregroundStyle(theme.primary)
                     .frame(width: Metrics.l)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {

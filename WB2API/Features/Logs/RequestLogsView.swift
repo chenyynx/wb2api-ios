@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 请求日志：请求指标块 + 最近请求流水。
 struct RequestLogsView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
 
     @State private var metrics = Loader<RequestMetrics>()
@@ -26,7 +28,7 @@ struct RequestLogsView: View {
                             title: "成功率",
                             value: value.successRateLabel,
                             caption: "HTTP \(value.httpSuccessRateLabel)",
-                            tint: Accent.primary
+                            tint: theme.primary
                         )
                         StatTile(title: "平均耗时", value: value.avgDurationLabel)
                         StatTile(title: "进行中", value: value.inFlightLabel, caption: "此刻仍在处理")

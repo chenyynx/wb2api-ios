@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 积分卡：剩余 / 总额、水位条、最早到期与近期到期明细。
 struct CreditsCard: View {
+    @Environment(\.appTheme) private var theme
+
     let account: Account
 
     var body: some View {
@@ -22,7 +24,7 @@ struct CreditsCard: View {
             HStack(alignment: .firstTextBaseline, spacing: Metrics.xs) {
                 Text(Fmt.credits(account.credits))
                     .font(.metric(.largeTitle))
-                    .foregroundStyle(Accent.primary)
+                    .foregroundStyle(theme.primary)
                     .contentTransition(.numericText())
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)

@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 「数据」Tab：一张主摘要卡 + 分组条形图 + 历史入口。
 struct DataView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
     @State private var loader = Loader<UsageSnapshot>()
     @State private var dimension: UsageDimension = .account
@@ -44,7 +46,7 @@ struct DataView: View {
             .scrollIndicators(.hidden)
             .background {
                 LinearGradient(
-                    colors: [Accent.soft.opacity(0.7), Color.clear],
+                    colors: [theme.soft.opacity(0.7), Color.clear],
                     startPoint: .top,
                     endPoint: .center
                 )

@@ -2,13 +2,15 @@ import SwiftUI
 
 /// 登录成功卡片：展示回填的账号凭据与积分。
 struct LoginResultCard: View {
+    @Environment(\.appTheme) private var theme
+
     let result: LoginPollResponse
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.m) {
             Label("登录成功", systemImage: "checkmark.seal.fill")
                 .font(.headline)
-                .foregroundStyle(Accent.primary)
+                .foregroundStyle(theme.primary)
                 .symbolEffect(.bounce, value: result.uid)
 
             LabeledContent {

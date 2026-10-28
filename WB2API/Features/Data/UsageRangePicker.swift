@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 区间选择：横向胶囊 chips，Dynamic Type 变大时可横向滚动。
 struct UsageRangePicker: View {
+    @Environment(\.appTheme) private var theme
+
     @Binding var selection: UsageRange
 
     var body: some View {
@@ -21,7 +23,7 @@ struct UsageRangePicker: View {
                                 Capsule()
                                     .fill(
                                         selection == item
-                                            ? AnyShapeStyle(Accent.gradient)
+                                            ? AnyShapeStyle(theme.gradient)
                                             : AnyShapeStyle(HierarchicalShapeStyle.quaternary)
                                     )
                             }

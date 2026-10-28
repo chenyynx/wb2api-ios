@@ -4,6 +4,8 @@ import SwiftUI
 ///
 /// 数据统一走 `client.overview()`（公网没有 `/status`）。
 struct OverviewView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
     @Environment(\.scenePhase) private var scenePhase
     @State private var model = OverviewModel()
@@ -61,7 +63,7 @@ struct OverviewView: View {
             .scrollIndicators(.hidden)
             .background {
                 LinearGradient(
-                    colors: [Accent.soft.opacity(0.8), Color.clear],
+                    colors: [theme.soft.opacity(0.8), Color.clear],
                     startPoint: .top,
                     endPoint: .center
                 )

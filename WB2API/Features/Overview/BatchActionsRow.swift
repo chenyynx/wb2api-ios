@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 批量操作：整卡一张玻璃面板，内部四列图标按钮（不再各自一块玻璃）。
 struct BatchActionsRow: View {
+    @Environment(\.appTheme) private var theme
+
     let running: BatchAction?
     let onRun: (BatchAction) -> Void
 
@@ -37,7 +39,7 @@ struct BatchActionsRow: View {
                 } else {
                     Image(systemName: action.icon)
                         .font(.title3)
-                        .foregroundStyle(Accent.primary)
+                        .foregroundStyle(theme.primary)
                         .frame(height: 22)
                         .symbolEffect(.bounce, value: running)
                 }

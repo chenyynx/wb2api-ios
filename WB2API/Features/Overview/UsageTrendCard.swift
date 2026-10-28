@@ -6,6 +6,8 @@ import SwiftUI
 /// 数据来自 `usage.series`（`{t:"2026-10-24T02", total_tokens, requests}`），
 /// 概览本来就会拉 usage（为了「今日消耗」），这里复用同一份快照，不额外请求。
 struct UsageTrendCard: View {
+    @Environment(\.appTheme) private var theme
+
     let usage: UsageSnapshot?
 
     /// 拖动选中的桶索引；nil = 未选中（显示总量）。
@@ -137,11 +139,11 @@ struct UsageTrendCard: View {
     /// 选中指示线。
     private func indicator(at x: CGFloat, height: CGFloat) -> some View {
         RoundedRectangle(cornerRadius: 1)
-            .fill(Accent.primary)
+            .fill(theme.primary)
             .frame(width: 2, height: height)
             .overlay(alignment: .bottom) {
                 Circle()
-                    .fill(Accent.primary)
+                    .fill(theme.primary)
                     .frame(width: 6, height: 6)
                     .offset(y: 0)
             }
@@ -226,7 +228,7 @@ struct UsageTrendCard: View {
     /// 最近的桶用主色，往前依次变淡，形成时间梯度。
     private func barColor(index: Int) -> Color {
         let ratio = Double(index + 1) / Double(max(buckets.count, 1))
-        return Accent.primary.opacity(0.25 + 0.6 * ratio)
+        return theme.primary.opacity(0.25 + 0.6 * ratio)
     }
 
     /// "2026-10-24T02" → "02时"；解析失败原样返回。

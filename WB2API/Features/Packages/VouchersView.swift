@@ -7,6 +7,8 @@ import UIKit
 /// 每张券有 `prize_name / code / valid_to / granted_at`；空数组占多数，之前用
 /// 通用 JSON 视图会把 11 个账号的空列表全铺出来，看起来像坏了。
 struct VouchersView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
     @State private var loader = Loader<VoucherResponse>()
     @State private var toast: Toast?
@@ -149,6 +151,8 @@ struct SchoolVoucher: Codable, Identifiable, Sendable {
 // MARK: - 行
 
 private struct VoucherRow: View {
+    @Environment(\.appTheme) private var theme
+
     let voucher: SchoolVoucher
     var onCopy: () -> Void
 
@@ -174,7 +178,7 @@ private struct VoucherRow: View {
                     Image(systemName: "doc.on.doc")
                         .font(.caption)
                 }
-                .foregroundStyle(Accent.primary)
+                .foregroundStyle(theme.primary)
                 .padding(Metrics.s)
                 .background(.quaternary.opacity(0.4), in: .rect(cornerRadius: Metrics.radiusS))
             }

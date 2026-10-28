@@ -20,20 +20,6 @@ extension Color {
     }
 }
 
-/// 全 App 唯一强调色（紫）。除语义状态外，不引入第二种品牌色。
-enum Accent {
-    static let primary = Color(light: "7C5CFF", dark: "A48BFF")
-    static let soft = Color(light: "EFEAFF", dark: "2A2350")
-
-    static var gradient: LinearGradient {
-        LinearGradient(
-            colors: [primary, Color(light: "5B3BE0", dark: "8E74FF")],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-}
-
 // MARK: - 间距 / 圆角
 
 enum Metrics {

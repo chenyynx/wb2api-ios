@@ -4,12 +4,14 @@ import SwiftUI
 ///
 /// 账号只有国内、国际两类，用首字母头像既没信息量又容易混淆，这里直接给域图标。
 struct AccountAvatar: View {
+    @Environment(\.appTheme) private var theme
+
     let account: Account
     var size: CGFloat = 42
 
     private var isGlobal: Bool { account.realm == "global" }
 
-    private var tint: Color { isGlobal ? .teal : Accent.primary }
+    private var tint: Color { isGlobal ? .teal : theme.primary }
 
     private var icon: String {
         isGlobal ? "globe.asia.australia.fill" : "building.2.fill"

@@ -25,12 +25,7 @@ struct TasksView: View {
                     if isInitialLoading {
                         LoadingSkeleton(rows: 3)
                     } else {
-                        QueueStatusCard(
-                            running: queue.value?.isRunning ?? false,
-                            total: queue.value?.queuedCount ?? 0,
-                            concurrency: queue.value?.conc,
-                            startedAt: queue.value?.startedAt
-                        )
+                        QueueStatusCard(queue: queue.value)
                         QueueItemsCard(items: queue.value?.items ?? [])
                         QueueActionsRow(
                             isScanning: isScanning,

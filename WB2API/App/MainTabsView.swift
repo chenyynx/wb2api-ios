@@ -5,6 +5,8 @@ enum AppTab: Hashable {
 }
 
 struct MainTabsView: View {
+    @Environment(\.appTheme) private var theme
+
     @State private var selection: AppTab = .overview
     @State private var toast: Toast?
 
@@ -27,7 +29,7 @@ struct MainTabsView: View {
             }
         }
         .tabBarMinimizeBehavior(.onScrollDown)
-        .tint(Accent.primary)
+        .tint(theme.primary)
         .toast($toast)
     }
 }

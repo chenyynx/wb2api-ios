@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 模型输出速度测试：逐个模型跑固定 prompt，测 TTFB 与首字后的 tok/s。
 struct ModelSpeedTestView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
     @State private var models = Loader<ModelsResponse>()
     @State private var runner = ModelSpeedRunner()
@@ -101,7 +103,7 @@ struct ModelSpeedTestView: View {
                     HStack(alignment: .firstTextBaseline, spacing: Metrics.s) {
                         Text(best.tokensPerSecond, format: .number.precision(.fractionLength(1)))
                             .font(.metric(.largeTitle))
-                            .foregroundStyle(Accent.primary)
+                            .foregroundStyle(theme.primary)
                             .contentTransition(.numericText())
                         Text("tok/s")
                             .font(.footnote)
@@ -122,7 +124,7 @@ struct ModelSpeedTestView: View {
                         )
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(runner.isRunning ? .red : Accent.primary)
+                    .tint(runner.isRunning ? .red : theme.primary)
 
                     if runner.isRunning {
                         Text("\(runner.completed)/\(runner.total)")
@@ -239,6 +241,8 @@ struct ModelSpeedTestView: View {
 
 /// 单个模型行：结果在右，播放按钮单独测。
 private struct ModelSpeedTestRow: View {
+    @Environment(\.appTheme) private var theme
+
     let model: ModelInfo
     let result: ModelSpeedResult?
     let state: ModelSpeedState
@@ -262,7 +266,7 @@ private struct ModelSpeedTestRow: View {
                     Text(result.tokensPerSecond, format: .number.precision(.fractionLength(1)))
                         .font(.title3.bold())
                         .monospacedDigit()
-                        .foregroundStyle(Accent.primary)
+                        .foregroundStyle(theme.primary)
                     Text("tok/s")
                         .font(.caption2)
                         .foregroundStyle(.secondary)

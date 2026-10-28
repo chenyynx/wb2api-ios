@@ -5,6 +5,8 @@ import SwiftUI
 /// 后端 `tasks/queue` 的 `items` 是 `{uid,nickname,kind,code,title,status,message}`。
 /// 之前只显示汇总数字，用户看不出卡在哪一项、为什么跳过。
 struct QueueItemsCard: View {
+    @Environment(\.appTheme) private var theme
+
     let items: [JSONValue]
 
     private var lines: [QueueLine] {
@@ -51,7 +53,7 @@ struct QueueItemsCard: View {
     private func row(_ line: QueueLine) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: Metrics.s) {
             Circle()
-                .fill(line.tint)
+                .fill(line.tint(for: theme))
                 .frame(width: 7, height: 7)
                 .padding(.top, 5)
 
@@ -108,10 +110,10 @@ struct QueueLine: Identifiable {
         }
     }
 
-    var tint: Color {
+    func tint(for theme: AppTheme) -> Color {
         switch status {
         case "done": return .green
-        case "running": return Accent.primary
+        case "running": return theme.primary
         case "skipped": return .secondary
         case "error", "failed": return .red
         default: return .orange

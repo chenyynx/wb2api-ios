@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 日志：每 5 秒自动刷新的实时流，按通道筛选，并可进入请求日志与错误汇总。
 struct LogsView: View {
+    @Environment(\.appTheme) private var theme
+
     /// 只看与该账号相关的日志（昵称 / UID 前缀，大小写不敏感）。
     var keyword: String?
 
@@ -36,7 +38,7 @@ struct LogsView: View {
                     HStack(spacing: Metrics.s) {
                         Label("仅看 \(key)", systemImage: "line.3.horizontal.decrease.circle.fill")
                             .font(.footnote)
-                            .foregroundStyle(Accent.primary)
+                            .foregroundStyle(theme.primary)
                         Spacer(minLength: 0)
                         Button("清除") { filterKeyword = nil }
                             .font(.footnote)

@@ -3,6 +3,8 @@ import SwiftUI
 /// 设置：服务器地址、访问密钥、连接测试、关于与退出登录。
 struct SettingsView: View {
     @Environment(SessionStore.self) private var session
+    @Environment(\.appTheme) private var theme
+    @AppStorage(AppTheme.storageKey) private var accentName = AccentChoice.violet.rawValue
 
     @State private var keyDraft = ""
     @State private var isTesting = false
@@ -76,10 +78,18 @@ struct SettingsView: View {
             }
 
             Section {
+                AccentPickerRow(selection: $accentName)
+            } header: {
+                Text("外观")
+            } footer: {
+                Text("强调色会应用到按钮、图表、高亮与渐变，切换后立即生效。")
+            }
+
+            Section {
                 LabeledContent("版本", value: appVersion)
                 LabeledContent("构建", value: buildNumber)
                 LabeledContent("系统要求", value: "iOS 26")
-                LabeledContent("设计", value: "Liquid Glass · 紫色强调")
+                LabeledContent("设计", value: "Liquid Glass · \(theme.accent.title)强调")
             } header: {
                 Text("关于")
             } footer: {

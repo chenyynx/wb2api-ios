@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 模型详情头卡：ID、描述、状态标签与计费倍率。
 struct ModelDetailHeaderCard: View {
+    @Environment(\.appTheme) private var theme
+
     let model: ModelInfo
 
     var body: some View {
@@ -18,7 +20,7 @@ struct ModelDetailHeaderCard: View {
 
             HStack(spacing: Metrics.xs) {
                 if model.isDefault == true {
-                    StatusTag(text: "默认模型", systemImage: "star.fill", tint: Accent.primary)
+                    StatusTag(text: "默认模型", systemImage: "star.fill", tint: theme.primary)
                 }
                 StatusTag(
                     text: model.busyLabel,
@@ -32,7 +34,7 @@ struct ModelDetailHeaderCard: View {
             HStack(alignment: .firstTextBaseline, spacing: Metrics.s) {
                 Text(model.creditMultiplierText)
                     .font(.metric())
-                    .foregroundStyle(Accent.primary)
+                    .foregroundStyle(theme.primary)
                     .contentTransition(.numericText())
                 Text("倍率")
                     .font(.footnote)

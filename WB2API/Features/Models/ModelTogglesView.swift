@@ -5,6 +5,8 @@ import SwiftUI
 /// 状态来自 `overview.accounts[].model_off`，写入走 `POST accounts/{uid}/model_toggle`
 /// （后端字段是 `off`，不是 `enabled`）。
 struct ModelTogglesView: View {
+    @Environment(\.appTheme) private var theme
+
     let account: Account
 
     @Environment(SessionStore.self) private var session
@@ -115,7 +117,7 @@ struct ModelTogglesView: View {
                 }
             }
         }
-        .tint(Accent.primary)
+        .tint(theme.primary)
         .disabled(busy.contains(id))
     }
 

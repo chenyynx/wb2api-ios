@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 模型目录：搜索 + 默认/繁忙标记 + 详情导航 + 探测结果弹层。
 struct ModelsView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
 
     @State private var models = Loader<ModelsResponse>()
@@ -27,7 +29,7 @@ struct ModelsView: View {
                     HStack(spacing: Metrics.m) {
                         Image(systemName: "speedometer")
                             .font(.title3)
-                            .foregroundStyle(Accent.primary)
+                            .foregroundStyle(theme.primary)
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 2) {
                             Text("输出速度测试")

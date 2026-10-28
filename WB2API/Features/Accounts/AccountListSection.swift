@@ -6,6 +6,8 @@ import SwiftUI
 /// 里是通透的，在账号页却发灰。这里改成和概览一致：ScrollView + LazyVStack。
 /// 行操作（签到/复活/暂停/禁用）保留在长按菜单里。
 struct AccountListSection: View {
+    @Environment(\.appTheme) private var theme
+
     let model: AccountsModel
     let zoomNamespace: Namespace.ID
     var onReload: () -> Void
@@ -57,7 +59,7 @@ struct AccountListSection: View {
         // 与概览同款暖紫渐变：玻璃需要背后的颜色才通透。
         .background {
             LinearGradient(
-                colors: [Accent.soft.opacity(0.9), Color.clear],
+                colors: [theme.soft.opacity(0.9), Color.clear],
                 startPoint: .top,
                 endPoint: .center
             )

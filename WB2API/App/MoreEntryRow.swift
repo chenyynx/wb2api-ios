@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 「更多」页的单行入口。
 struct MoreEntryRow: View {
+    @Environment(\.appTheme) private var theme
+
     let title: String
     let subtitle: String
     let systemImage: String
@@ -9,7 +11,7 @@ struct MoreEntryRow: View {
     var body: some View {
         HStack(spacing: Metrics.m) {
             Image(systemName: systemImage)
-                .foregroundStyle(Accent.primary)
+                .foregroundStyle(theme.primary)
                 .frame(width: Metrics.l)
                 .accessibilityHidden(true)
 

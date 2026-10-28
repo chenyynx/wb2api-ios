@@ -4,6 +4,8 @@ import SwiftUI
 ///
 /// 刷新时重新调 `client.overview()`，按 uid 找回同一个账号。
 struct AccountDetailView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
     @Environment(\.dismiss) private var dismiss
 
@@ -88,7 +90,7 @@ struct AccountDetailView: View {
         .scrollIndicators(.hidden)
         .background {
             LinearGradient(
-                colors: [Accent.soft.opacity(0.8), Color.clear],
+                colors: [theme.soft.opacity(0.8), Color.clear],
                 startPoint: .top,
                 endPoint: .center
             )

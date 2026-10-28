@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 概览指标网格：积分 / 今日消耗 / 成功率 / 缓存命中。
 struct OverviewStatsGrid: View {
+    @Environment(\.appTheme) private var theme
+
     let digest: OverviewDigest
 
     private let columns = [
@@ -15,7 +17,7 @@ struct OverviewStatsGrid: View {
                 title: "剩余积分",
                 value: Fmt.credits(digest.totalCredits),
                 caption: "全部账号合计",
-                tint: Accent.primary
+                tint: theme.primary
             )
             StatTile(
                 title: "今日消耗",

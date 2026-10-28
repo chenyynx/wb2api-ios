@@ -42,7 +42,7 @@ enum LogChannel: String, CaseIterable, Identifiable {
         }
     }
 
-    static func tint(for raw: String?) -> Color {
-        raw == "chat" ? Accent.primary : .secondary
+    static func tint(for raw: String?, theme: AppTheme) -> Color {
+        raw == "chat" ? theme.primary : .secondary
     }
 }

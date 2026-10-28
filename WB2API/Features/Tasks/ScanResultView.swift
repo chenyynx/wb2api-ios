@@ -2,6 +2,8 @@ import SwiftUI
 
 /// 扫描结果：按账号分组，可逐账号 / 逐任务勾选，单独执行或批量执行。
 struct ScanResultView: View {
+    @Environment(\.appTheme) private var theme
+
     let tasks: [AccountTask]
     let selected: Set<String>
     let running: [String: TaskRunState]
@@ -59,7 +61,7 @@ struct ScanResultView: View {
                 } label: {
                     Image(systemName: allChosen ? "checkmark.circle.fill" : (chosen > 0 ? "minus.circle.fill" : "circle"))
                         .font(.title3)
-                        .foregroundStyle(chosen > 0 ? Accent.primary : Color.secondary)
+                        .foregroundStyle(chosen > 0 ? theme.primary : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(allChosen ? "取消选择 \(group.nickname)" : "选择 \(group.nickname) 的全部任务")
@@ -74,7 +76,7 @@ struct ScanResultView: View {
                         Spacer()
                         Text(chosen > 0 ? "已选 \(chosen)/\(group.tasks.count)" : "\(group.tasks.count) 项")
                             .font(.caption)
-                            .foregroundStyle(chosen > 0 ? Accent.primary : Color.secondary)
+                            .foregroundStyle(chosen > 0 ? theme.primary : Color.secondary)
                         Image(systemName: expanded ? "chevron.up" : "chevron.down")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
@@ -122,6 +124,8 @@ enum TaskAction: String {
 }
 
 private struct TaskRow: View {
+    @Environment(\.appTheme) private var theme
+
     let task: AccountTask
     let isSelected: Bool
     let state: TaskRunState?
@@ -136,7 +140,7 @@ private struct TaskRow: View {
                 Button(action: onToggle) {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.title3)
-                        .foregroundStyle(isSelected ? Accent.primary : Color.secondary)
+                        .foregroundStyle(isSelected ? theme.primary : Color.secondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(isSelected ? "取消选择 \(task.title)" : "选择 \(task.title)")
@@ -147,12 +151,12 @@ private struct TaskRow: View {
                             .font(.callout)
                             .lineLimit(2)
                         Spacer(minLength: 0)
-                        StatusTag(text: task.statusText, systemImage: "circle.fill", tint: task.statusTint)
+                        StatusTag(text: task.statusText, systemImage: "circle.fill", tint: task.statusTint(for: theme))
                     }
 
                     if let progress = task.progressText {
                         ProgressView(value: task.target.map { Double(min(task.current ?? 0, $0)) / Double($0) } ?? 0)
-                            .tint(Accent.primary)
+                            .tint(theme.primary)
                         Text("进度 \(progress)")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -201,10 +205,10 @@ private struct TaskRow: View {
             }
         }
         .padding(Metrics.s)
-        .background(isSelected ? Accent.primary.opacity(0.08) : Color.clear, in: .rect(cornerRadius: Metrics.radiusS))
+        .background(isSelected ? theme.primary.opacity(0.08) : Color.clear, in: .rect(cornerRadius: Metrics.radiusS))
         .overlay {
             RoundedRectangle(cornerRadius: Metrics.radiusS)
-                .strokeBorder(isSelected ? Accent.primary.opacity(0.35) : .clear, lineWidth: 1)
+                .strokeBorder(isSelected ? theme.primary.opacity(0.35) : .clear, lineWidth: 1)
         }
         .animation(.snappy, value: task.acceptStatus)
         .animation(.snappy, value: isSelected)

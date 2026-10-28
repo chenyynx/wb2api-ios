@@ -50,10 +50,10 @@ struct AccountTask: Identifiable, Sendable, Equatable {
         }
     }
 
-    var statusTint: Color {
+    func statusTint(for theme: AppTheme) -> Color {
         switch acceptStatus {
         case "completed", "claimed": return .green
-        case "accepted": return Accent.primary
+        case "accepted": return theme.primary
         default: return .orange
         }
     }

@@ -4,6 +4,8 @@ import SwiftUI
 ///
 /// 轮询用 `.task(id:)` 绑定授权 state：换链接、离开页面都会自动取消旧循环。
 struct LoginView: View {
+    @Environment(\.appTheme) private var theme
+
     @Environment(SessionStore.self) private var session
 
     /// 登录域：国内版 cn / 国际版 global
@@ -79,7 +81,7 @@ struct LoginView: View {
                     VStack(alignment: .leading, spacing: Metrics.s) {
                         HStack(spacing: Metrics.s) {
                             Image(systemName: timedOut ? "hourglass.badge.xmark" : "hourglass")
-                                .foregroundStyle(timedOut ? Color.orange : Accent.primary)
+                                .foregroundStyle(timedOut ? Color.orange : theme.primary)
                                 .symbolEffect(.pulse, options: .repeating, isActive: !timedOut)
                             Text(timedOut ? "授权超时" : "等待授权…")
                                 .font(.headline)

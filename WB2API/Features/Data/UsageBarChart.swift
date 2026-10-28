@@ -3,6 +3,8 @@ import SwiftUI
 
 /// 用量条形图：按分组展示请求数，尾注给出同样直观的数量级。
 struct UsageBarChart: View {
+    @Environment(\.appTheme) private var theme
+
     let title: String
     let groups: [UsageGroup]
     var limit: Int = 8
@@ -44,7 +46,7 @@ struct UsageBarChart: View {
                         x: .value("请求数", group.requests ?? 0),
                         y: .value("分组", label(for: group))
                     )
-                    .foregroundStyle(Accent.gradient)
+                    .foregroundStyle(theme.gradient)
                     .cornerRadius(Metrics.xs)
                     .annotation(position: .trailing, alignment: .center, spacing: Metrics.xs) {
                         Text(Fmt.compact(group.requests))
