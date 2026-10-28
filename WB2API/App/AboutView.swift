@@ -22,7 +22,7 @@ struct AboutView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: Metrics.xs) {
-                    Text("WB2API iOS")
+                    Text("Work")
                         .font(.title3.bold())
                     Text("WorkBuddy2API 面板的 iOS 原生客户端。SwiftUI 零第三方依赖，iOS 26 Liquid Glass。")
                         .font(.footnote)

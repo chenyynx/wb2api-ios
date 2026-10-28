@@ -7,7 +7,7 @@ struct MoreBrandHeader: View {
             BrandMark(size: 40)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("WorkBuddy 面板")
+                Text("Work")
                     .font(.title3.bold())
                 Text("WorkBuddy2API · 账号池运维面板")
                     .font(.footnote)
