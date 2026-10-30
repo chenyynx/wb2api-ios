@@ -23,7 +23,7 @@ targets:
         PRODUCT_NAME: WB2API
         GENERATE_INFOPLIST_FILE: YES
         MARKETING_VERSION: "1.3.0"
-        CURRENT_PROJECT_VERSION: "36"
+        CURRENT_PROJECT_VERSION: "37"
         INFOPLIST_KEY_CFBundleDisplayName: Work
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES

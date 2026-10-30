@@ -1,9 +1,14 @@
 import SwiftUI
 
-/// 分组维度切换 + 条形图：控制与图表放在同一段，避免控件和结果分离。
+/// 分组维度切换 + 排行条形图：控制与结果放在同一段，避免控件和结果分离。
 struct DataBreakdownSection: View {
     @Binding var dimension: UsageDimension
+    @Binding var metric: UsageMetric
     let snapshot: UsageSnapshot
+
+    private var groups: [UsageGroup] {
+        metric.sorted(dimension.groups(in: snapshot))
+    }
 
     var body: some View {
         VStack(spacing: Metrics.m) {
@@ -16,8 +21,9 @@ struct DataBreakdownSection: View {
             .accessibilityLabel("统计维度")
 
             UsageBarChart(
-                title: dimension.chartTitle,
-                groups: dimension.groups(in: snapshot)
+                title: "\(metric.title) · \(dimension.noun)",
+                groups: groups,
+                metric: $metric
             )
         }
     }

@@ -7,6 +7,8 @@ struct DataView: View {
     @Environment(SessionStore.self) private var session
     @State private var loader = Loader<UsageSnapshot>()
     @State private var dimension: UsageDimension = .account
+    /// 排行口径持久化：默认按积分消耗，直接回答「哪个模型最烧积分」。
+    @AppStorage("wb2api.usageMetric") private var metric: UsageMetric = .credits
     @State private var range: UsageRange = .days7
 
     var body: some View {
@@ -28,7 +30,11 @@ struct DataView: View {
                     if isInitialLoading {
                         LoadingSkeleton(rows: 4)
                     } else if let snapshot = loader.value {
-                        DataBreakdownSection(dimension: $dimension, snapshot: snapshot)
+                        DataBreakdownSection(
+                            dimension: $dimension,
+                            metric: $metric,
+                            snapshot: snapshot
+                        )
                         DataHistoryLinks()
                     } else if loader.error == nil {
                         ContentUnavailableView {

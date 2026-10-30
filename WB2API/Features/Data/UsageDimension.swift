@@ -16,11 +16,12 @@ enum UsageDimension: String, CaseIterable, Identifiable {
         }
     }
 
-    var chartTitle: String {
+    /// 图表标题里跟在度量口径后面的名词，如「积分消耗 · 模型」。
+    var noun: String {
         switch self {
-        case .account: "请求数 · 账号"
-        case .model: "请求数 · 模型"
-        case .realm: "请求数 · 域"
+        case .account: "账号"
+        case .model: "模型"
+        case .realm: "域"
         }
     }
 
@@ -32,17 +33,15 @@ enum UsageDimension: String, CaseIterable, Identifiable {
         }
     }
 
-    /// 该维度下的分组，按请求数从多到少排序。
+    /// 该维度下的原始分组；排序交给 `UsageMetric.sorted(_:)`，因为口径可切换。
     func groups(in snapshot: UsageSnapshot) -> [UsageGroup] {
-        let raw: [UsageGroup]
         switch self {
         case .account:
-            raw = snapshot.byAccount ?? []
+            return snapshot.byAccount ?? []
         case .model:
-            raw = snapshot.byModel ?? []
+            return snapshot.byModel ?? []
         case .realm:
-            raw = snapshot.byRealm ?? []
+            return snapshot.byRealm ?? []
         }
-        return raw.sorted { ($0.requests ?? 0) > ($1.requests ?? 0) }
     }
 }

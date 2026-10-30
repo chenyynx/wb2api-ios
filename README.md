@@ -1,6 +1,6 @@
 # WB2API iOS
 
-> **最新安装包**：[WB2API-unsigned.ipa（1.3.0 · build 36）](https://github.com/chenyynx/wb2api-ios/releases/latest/download/WB2API-unsigned.ipa)
+> **最新安装包**：[WB2API-unsigned.ipa（1.3.0 · build 37）](https://github.com/chenyynx/wb2api-ios/releases/latest/download/WB2API-unsigned.ipa)
 > 未签名 IPA，需用全能签 / SideStore / AltStore 等工具重签后安装。
 
 [![CI](https://github.com/chenyynx/wb2api-ios/actions/workflows/ci.yml/badge.svg)](https://github.com/chenyynx/wb2api-ios/actions/workflows/ci.yml)
@@ -30,7 +30,7 @@
 | 概览 | 池健康度与关键指标、模型限流状态、批量签到 / 巡检 / 活跃上报 / 保活、24 小时用量趋势（可逐小时查看） |
 | 账号 | 搜索与筛选、状态与恢复倒计时、周期刷新、账号详情（额度、模型成本、到期、最近错误）、单账号操作（签到、余额、旅行、暂停、禁用、复活、移除）、按账号启停模型 |
 | 任务 | 扫描成长任务、按账号 / 按任务勾选执行、执行队列状态与逐项明细、暂停队列、单任务完整执行（接受 → 执行 → 回读校验 → 领奖） |
-| 数据 | 用量区间统计（3 天 / 7 天 / 30 天 / 全部）、按账号 / 模型 / 域聚合、积分历史、余额趋势 |
+| 数据 | 六档区间统计（今日 / 昨日 / 3 天 / 7 天 / 30 天 / 总计）、按账号 / 模型 / 域聚合、按请求数 / 积分消耗 / Token 排序、积分历史、余额趋势 |
 | 模型 | 模型目录与能力字段、探测结果 |
 | 日志 | 实时日志流（系统 / 对话 / 任务）、请求指标、错误汇总 |
 | 资源 | 礼包明细、券码、补偿领取 |
