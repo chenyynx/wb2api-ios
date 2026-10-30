@@ -60,7 +60,9 @@ final class AccountsModel {
 
     /// - Parameter syncBalance: 用户主动刷新时为 true——先让后端查一轮上游余额，
     ///   否则面板缓存的积分不会变。节流期内跳过上游同步但仍然重拉 overview。
-    func load(using client: APIClient?, syncBalance: Bool = false) async {
+    /// - Parameter force: 动作完成后必须传入 true——否则遇到进行中的轮询会被跳过，
+    ///   列表看起来「操作了但状态没变」。
+    func load(using client: APIClient?, syncBalance: Bool = false, force: Bool = false) async {
         guard let client else {
             toast = Toast(kind: .failure, text: "尚未配置服务器地址")
             return
@@ -70,8 +72,8 @@ final class AccountsModel {
             await BalanceSync.refreshAll(client: client)
         }
         defer { if syncBalance { isReloading = false } }
-        // 主动刷新强制重发，不被进行中的轮询挡掉
-        await loader.load(force: syncBalance) { try await client.overview() }
+        // 主动刷新 / 动作后重读都强制重发，不被进行中的轮询挡掉
+        await loader.load(force: syncBalance || force) { try await client.overview() }
         guard syncBalance else { return }
         if let error = loader.error {
             toast = Toast(kind: .failure, text: error)
@@ -105,7 +107,8 @@ final class AccountsModel {
                 kind: .success,
                 text: outcome.message ?? "\(account.displayName) · \(command.title)已提交"
             )
-            await load(using: client)
+            // 强制重读：复活 / 恢复后必须立刻反映到列表状态
+            await load(using: client, force: true)
         } catch {
             toast = Toast(kind: .failure, text: "\(command.title)失败：\(error.humanMessage)")
         }

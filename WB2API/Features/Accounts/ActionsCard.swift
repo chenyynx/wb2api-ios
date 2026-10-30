@@ -2,6 +2,7 @@ import SwiftUI
 
 /// 操作卡：8 个单号操作 + 底部「移除账号」（二次确认挂在按钮上）。
 struct ActionsCard: View {
+    let account: Account
     let busy: AccountCommand?
     let onAction: (AccountCommand) -> Void
     let onRemove: () -> Void
@@ -41,7 +42,7 @@ struct ActionsCard: View {
                     }
                     .buttonStyle(.glass)
                     .controlSize(.large)
-                    .disabled(busy != nil)
+                    .disabled(busy != nil || !isApplicable(command))
                     .accessibilityHint(command.hint)
                 }
             }
@@ -67,5 +68,15 @@ struct ActionsCard: View {
             }
         }
         .glassCard()
+    }
+
+    /// 暂停 / 恢复互斥：恢复只对已暂停账号有意义，反之亦然；
+    /// 之前所有按钮都常亮，点「恢复」对没暂停的号是无操作，看起来像状态没刷新。
+    private func isApplicable(_ command: AccountCommand) -> Bool {
+        switch command {
+        case .pause: return !account.isPaused
+        case .resume: return account.isPaused
+        default: return true
+        }
     }
 }

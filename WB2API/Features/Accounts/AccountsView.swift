@@ -68,6 +68,12 @@ struct AccountsView: View {
             .onAppear {
                 Task { await model.refreshIfStale(after: 3, using: session.client()) }
             }
+            .onChange(of: path) { _, newPath in
+                // 详情页里做的复活 / 恢复 / 移除不会回传列表：回到列表时强制重读一次，
+                // 不等 20 秒轮询（用户会以为「操作了但状态没变」）。
+                guard newPath.isEmpty else { return }
+                Task { await model.load(using: session.client(), force: true) }
+            }
             .onChange(of: scenePhase) { _, phase in
                 // 从后台回来时拉一次（仅轻量读缓存级 overview，不触发上游同步）
                 guard phase == .active else { return }

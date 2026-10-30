@@ -84,12 +84,22 @@ struct DataUsageSummaryCard: View {
                 DataMetricCell(title: "请求", value: Fmt.compact(requests))
                 DataMetricCell(title: "积分", value: Fmt.creditsDouble(credits))
                 DataMetricCell(
-                    title: range.isSingleDay ? "平均速度" : "日均",
+                    title: range.isSingleDay ? "每请求均速" : "日均",
                     value: range.isSingleDay ? speedText : dailyText
                 )
                 DataMetricCell(title: "错误数", value: Fmt.compact(errors), tint: errorTint)
                 DataMetricCell(title: "平均延迟", value: Fmt.latency(totals?.avgLatencyMs))
                 DataMetricCell(title: "缓存命中", value: Fmt.rate(totals?.cacheHitRate))
+            }
+
+            // 面板的 avg_tokens_per_second 是「每次请求 tok/s 的简单平均」，
+            // 不是按生成时长加权；短请求权重和长请求一样，读数会明显偏高。
+            // 这里把口径写清楚，避免和账号详情 / 日志里的单次实测值对不上。
+            if range.isSingleDay, totals?.avgTokensPerSecond != nil {
+                Text("每请求简单平均，短请求会拉高读数；单次实测见账号详情")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(Metrics.m)

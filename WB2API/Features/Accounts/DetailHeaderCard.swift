@@ -38,9 +38,15 @@ struct DetailHeaderCard: View {
             }
 
             if account.isDisabled {
-                Label("已禁用，不参与调度", systemImage: "pause.circle.fill")
+                Label("已禁用，不参与调度", systemImage: "nosign")
                     .font(.footnote)
                     .foregroundStyle(.red)
+            }
+
+            if account.isPaused {
+                Label("已暂停选号，仍参与签到 / 保活", systemImage: "pause.circle.fill")
+                    .font(.footnote)
+                    .foregroundStyle(.blue)
             }
 
             if account.isCooling, let until = account.until, let left = Fmt.countdown(until: until) {

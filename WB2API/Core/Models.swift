@@ -126,6 +126,9 @@ struct Account: Codable, Identifiable, Sendable {
     let modelOff: [ModelOffEntry]?
     let realm: String?
     let disabled: Bool?
+    /// 暂停选号（后端 `paused`）：与 disabled 正交——退出选号候选，但签到 / 活跃上报 /
+    /// 保活 / 余额刷新照常执行，点「恢复」立即回到池子。
+    let paused: Bool?
     /// 禁用原因（后端 disabled_reason，通常会写明 12153 会话失效）
     let disabledReason: String?
     let successCount: Int?
@@ -151,7 +154,8 @@ struct Account: Codable, Identifiable, Sendable {
         return "\(Int(seconds / 3600)) 小时 \(Int(seconds.truncatingRemainder(dividingBy: 3600) / 60)) 分"
     }
     var isDisabled: Bool { disabled ?? false }
-    var isHealthy: Bool { !isCooling && !isDisabled }
+    var isPaused: Bool { paused ?? false }
+    var isHealthy: Bool { !isCooling && !isDisabled && !isPaused }
 
     /// 需要交互式重新登录：已被禁用，或连续出现会话失效（12153）计数。
     /// 这两种情况下点「复活」是没用的（refresh token 也失效了），必须重新授权。
@@ -166,6 +170,9 @@ struct Account: Codable, Identifiable, Sendable {
         }
         if let fails = sessionDeadFails, fails > 0 {
             return "登录态已失效（连续 \(fails) 次会话失效），请重新登录"
+        }
+        if isPaused {
+            return "已暂停选号，不再接新请求；签到 / 保活照常。点「恢复」即可重新参与调度。"
         }
         if isCooling {
             if let left = coolingLeft { return "限流冷却中，\(left)后自动恢复，无需操作" }

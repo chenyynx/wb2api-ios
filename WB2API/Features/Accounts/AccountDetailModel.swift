@@ -23,7 +23,8 @@ final class AccountDetailModel {
     }
 
     /// - Parameter syncBalance: 用户主动刷新时为 true——先查这个号的上游余额再读快照。
-    func load(using client: APIClient?, syncBalance: Bool = false) async {
+    /// - Parameter force: 动作完成后传 true，避免被进行中的轮询跳过。
+    func load(using client: APIClient?, syncBalance: Bool = false, force: Bool = false) async {
         guard let client else {
             toast = Toast(kind: .failure, text: "尚未配置服务器地址")
             return
@@ -33,7 +34,7 @@ final class AccountDetailModel {
             await BalanceSync.refreshAccount(uid, client: client)
         }
         defer { if syncBalance { isReloading = false } }
-        await loader.load(force: syncBalance) { try await client.overview() }
+        await loader.load(force: syncBalance || force) { try await client.overview() }
         guard syncBalance else { return }
         if let error = loader.error {
             toast = Toast(kind: .failure, text: error)
@@ -66,7 +67,8 @@ final class AccountDetailModel {
                 return
             }
             toast = Toast(kind: .success, text: outcome.message ?? "\(command.title)已完成")
-            await load(using: client)
+            // 复活 / 恢复后状态要立刻变，不能让旧快照留在页面上
+            await load(using: client, force: true)
         } catch {
             toast = Toast(kind: .failure, text: "\(command.title)失败：\(error.humanMessage)")
         }

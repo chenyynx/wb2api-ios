@@ -72,7 +72,7 @@ final class FormatterTests: XCTestCase {
             uid: "u1", nickname: "A", credits: 10, creditsTotal: 100, sessionDeadFails: 0,
             creditsEarliestExpiry: nil, creditsEarliestRemaining: nil, creditsExpiryBuckets: nil,
             cooling: true, until: ISO8601DateFormatter().string(from: Date().addingTimeInterval(120)),
-            rateLimitedModels: nil, modelOff: nil, realm: "cn", disabled: false, disabledReason: nil, successCount: 1,
+            rateLimitedModels: nil, modelOff: nil, realm: "cn", disabled: false, paused: nil, disabledReason: nil, successCount: 1,
             lastSuccess: nil, lastErr: nil, checkinDone: true, tokenUsage: nil, modelCosts: nil
         )
         XCTAssertTrue(Fmt.accountState(cooling).hasPrefix("冷却中"))
@@ -80,7 +80,7 @@ final class FormatterTests: XCTestCase {
         let healthy = Account(
             uid: "u2", nickname: "B", credits: 10, creditsTotal: 100, sessionDeadFails: 0,
             creditsEarliestExpiry: nil, creditsEarliestRemaining: nil, creditsExpiryBuckets: nil,
-            cooling: false, until: nil, rateLimitedModels: nil, modelOff: nil, realm: "cn", disabled: false,
+            cooling: false, until: nil, rateLimitedModels: nil, modelOff: nil, realm: "cn", disabled: false, paused: nil,
             disabledReason: nil, successCount: 1, lastSuccess: nil, lastErr: nil, checkinDone: true, tokenUsage: nil, modelCosts: nil
         )
         XCTAssertEqual(Fmt.accountState(healthy), "可用")

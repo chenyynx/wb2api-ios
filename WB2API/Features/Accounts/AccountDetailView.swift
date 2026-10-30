@@ -77,6 +77,7 @@ struct AccountDetailView: View {
                 .staggeredAppear(index: 4)
 
                 ActionsCard(
+                    account: current,
                     busy: model.busy,
                     onAction: perform,
                     onRemove: requestRemove

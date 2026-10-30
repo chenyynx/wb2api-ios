@@ -42,13 +42,15 @@ struct AccountListRow: View {
                 Label("复活", systemImage: "bolt.heart")
             }
 
-            Button {
-                onAction(account.isDisabled ? .resume : .pause)
-            } label: {
-                Label(
-                    account.isDisabled ? "恢复" : "暂停",
-                    systemImage: account.isDisabled ? "play.fill" : "pause.fill"
-                )
+            if !account.isDisabled {
+                Button {
+                    onAction(account.isPaused ? .resume : .pause)
+                } label: {
+                    Label(
+                        account.isPaused ? "恢复" : "暂停",
+                        systemImage: account.isPaused ? "play.fill" : "pause.fill"
+                    )
+                }
             }
 
             Divider()

@@ -123,6 +123,7 @@ enum Fmt {
 
     static func accountState(_ account: Account) -> String {
         if account.isDisabled { return "已禁用" }
+        if account.isPaused { return "已暂停" }
         if account.isCooling {
             if let left = countdown(until: account.until) { return "冷却中 · \(left)后恢复" }
             return "冷却中"
