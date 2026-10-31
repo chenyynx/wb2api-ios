@@ -95,12 +95,13 @@ struct UsageBarChart: View {
             )
             .foregroundStyle(theme.gradient)
             .cornerRadius(Metrics.xs)
-            .annotation(position: .trailing, alignment: .center, spacing: Metrics.xs) {
+            // 尾注不要加 .contentTransition(.numericText())：口径切换时 Charts 会复用
+            // annotation 视图，数字过渡中的旧字形会和新数字叠在一起（实测出现多余笔画）。
+            .annotation(position: .trailing, alignment: .center, spacing: Metrics.s) {
                 Text(metric.text(for: metric.value(of: group)))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
-                    .contentTransition(.numericText())
             }
         }
         .chartXAxis(.hidden)
