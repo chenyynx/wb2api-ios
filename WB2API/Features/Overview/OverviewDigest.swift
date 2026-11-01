@@ -25,6 +25,8 @@ struct OverviewDigest: Equatable, Sendable {
     let earliestRecovery: String?
     /// 今日消耗 tokens（由 usage 小时桶聚合；无数据为 nil）
     let todayTokens: Int?
+    /// 「需重新登录」里已被用户忽略提醒的账号数（概览健康卡据此降级）。
+    let ignoredNeedsLoginCount: Int
 
     init(overview: OverviewResponse, usage: UsageSnapshot? = nil) {
         let accounts = overview.accounts
@@ -44,6 +46,7 @@ struct OverviewDigest: Equatable, Sendable {
 
         earliestRecovery = Self.earliestRecovery(in: accounts)
         todayTokens = usage.flatMap { Self.todayTokens(in: $0) }
+        ignoredNeedsLoginCount = accounts.filter { $0.needsLogin && IgnoredWarnings.isIgnored($0.uid) }.count
     }
 
     // MARK: 派生

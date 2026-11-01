@@ -20,7 +20,17 @@ struct HealthCard: View {
             items.append(StatusLine(id: 0, icon: "hourglass", text: digest.coolingLine, tint: .orange))
         }
         if digest.disabled > 0 {
-            items.append(StatusLine(id: 1, icon: "person.badge.key.fill", text: digest.disabledLine, tint: .red))
+            // 「需重新登录」里已被用户忽略的号不计入红色行，但保留知情权：
+            // 剩几个报几个（「4 个账号需重新登录（已忽略 2 个）」）；
+            // 全部被忽略时降级为一条灰色备注，不再红字刷屏。
+            let ignoredCount = digest.ignoredNeedsLoginCount
+            let visible = digest.disabled - ignoredCount
+            if visible > 0 {
+                let suffix = ignoredCount > 0 ? "（已忽略 \(ignoredCount) 个）" : ""
+                items.append(StatusLine(id: 1, icon: "person.badge.key.fill", text: "\(visible) 个账号需重新登录\(suffix)", tint: .red))
+            } else if ignoredCount > 0 {
+                items.append(StatusLine(id: 1, icon: "person.badge.key", text: "\(ignoredCount) 个账号登录失效 · 已忽略提醒", tint: .secondary))
+            }
         }
         if digest.inFlightFullCount > 0 {
             // 后端 in_flight_full 是「健康账号里在途名额已占满的个数」，不是布尔量：
