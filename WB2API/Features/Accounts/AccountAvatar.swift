@@ -8,6 +8,8 @@ struct AccountAvatar: View {
 
     let account: Account
     var size: CGFloat = 42
+    /// 警告已被忽略时状态点降级为灰色（正常仍是绿 / 蓝 / 红）。
+    var suppressWarning: Bool = false
 
     private var isGlobal: Bool { account.realm == "global" }
 
@@ -15,6 +17,11 @@ struct AccountAvatar: View {
 
     private var icon: String {
         isGlobal ? "globe.asia.australia.fill" : "building.2.fill"
+    }
+
+    private var dotColor: Color {
+        if suppressWarning { return .gray }
+        return AccountStatusStyle.tint(for: account)
     }
 
     var body: some View {
@@ -31,7 +38,7 @@ struct AccountAvatar: View {
             .clipShape(Circle())
             .overlay(alignment: .bottomTrailing) {
                 Circle()
-                    .fill(AccountStatusStyle.tint(for: account))
+                    .fill(dotColor)
                     .frame(width: size * 0.30, height: size * 0.30)
                     .overlay {
                         Circle()

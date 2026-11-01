@@ -15,6 +15,18 @@ struct AccountListSection: View {
     var onRelogin: (Account) -> Void
     var onCommand: (AccountCommand, Account) -> Void
     var onResetFilter: () -> Void = {}
+    /// 已忽略登录提醒的账号集合（父层持有，长按切换后写回 UserDefaults）。
+    @State private var ignoredWarnings: Set<String> = IgnoredWarnings.load()
+
+    private func toggleIgnore(_ account: Account) {
+        if ignoredWarnings.contains(account.uid) {
+            IgnoredWarnings.restore(account.uid)
+            ignoredWarnings.remove(account.uid)
+        } else {
+            IgnoredWarnings.ignore(account.uid)
+            ignoredWarnings.insert(account.uid)
+        }
+    }
 
     var body: some View {
         ScrollView {
@@ -43,11 +55,14 @@ struct AccountListSection: View {
                         AccountListRow(
                             account: account,
                             isBusy: model.busyUIDs.contains(account.uid),
+                            warningIgnored: ignoredWarnings.contains(account.uid),
                             namespace: zoomNamespace,
                             onOpen: { onOpen(account) },
                             onRelogin: { onRelogin(account) }
                         ) { command in
                             onCommand(command, account)
+                        } onToggleIgnore: {
+                            toggleIgnore(account)
                         }
                     }
                 }
